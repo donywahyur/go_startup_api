@@ -41,8 +41,8 @@ func main() {
 	campaignService := campaign.NewService(campaignRepository)
 
 	userHandler := handler.NewUserHandler(userService, authService)
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
-	authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNn0.2TvAoMU1dXOcxdNdNwvp2eszB4z7zG_9sTbu3zqOye4")
 	router := gin.Default()
 
 	api := router.Group("/api/v1")
@@ -51,6 +51,8 @@ func main() {
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
 	api.POST("/avatar", authMiddleware(authService, userService), userHandler.UploadAvatar)
+
+	api.GET("/campaigns", authMiddleware(authService, userService), campaignHandler.GetCampaigns)
 	router.Run()
 
 }
