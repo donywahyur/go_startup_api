@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go_startup_api/auth"
+	"go_startup_api/campaign"
 	"go_startup_api/handler"
 	"go_startup_api/helper"
 	"go_startup_api/user"
@@ -33,10 +34,11 @@ func main() {
 	}
 
 	userRepository := user.NewRepository(db)
-	// campaignRepository := campaign.NewRepository(db)
+	campaignRepository := campaign.NewRepository(db)
 
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
+	campaignService := campaign.NewService(campaignRepository)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 
