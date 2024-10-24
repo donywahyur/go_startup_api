@@ -3,6 +3,7 @@ package handler
 import (
 	"go_startup_api/campaign"
 	"go_startup_api/helper"
+	"go_startup_api/user"
 	"net/http"
 	"strconv"
 
@@ -54,5 +55,32 @@ func (h *campaignHandler) GetCampaign(c *gin.Context) {
 
 	formatter := campaign.FormatCampaignDetail(campaignDetail)
 	response := helper.APIResponse("Campaign detail", http.StatusOK, "success", formatter)
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *campaignHandler) CreateCampaign(c *gin.Context) {
+	var input campaign.CreateCampaignInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+		response := helper.APIResponse("Create campaign failed", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+
+	newCampaign, err := h.campaignService.CreateCampaign(input)
+	if err != nil {
+		response := helper.APIResponse("Create campaign failed", http.StatusBadRequest, "error", err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := campaign.FormatCampaign(newCampaign)
+	response := helper.APIResponse("Success create campaign", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 }
