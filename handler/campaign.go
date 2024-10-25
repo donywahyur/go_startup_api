@@ -142,7 +142,7 @@ func (h *campaignHandler) UploadCampaignImage(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
 		data := gin.H{"is_uploaded": false, "error": err.Error()}
-		response := helper.APIResponse("Failed to read file", http.StatusBadRequest, "error", data)
+		response := helper.APIResponse("Upload campaign image failed", http.StatusBadRequest, "error", data)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -156,7 +156,7 @@ func (h *campaignHandler) UploadCampaignImage(c *gin.Context) {
 	err = c.SaveUploadedFile(file, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false, "error": err.Error()}
-		response := helper.APIResponse("Failed to upload avatar image to folder", http.StatusBadRequest, "error", data)
+		response := helper.APIResponse("Upload campaign image failed", http.StatusBadRequest, "error", data)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -165,7 +165,7 @@ func (h *campaignHandler) UploadCampaignImage(c *gin.Context) {
 	if err != nil {
 		_ = os.Remove(path)
 		data := gin.H{"is_uploaded": false, "error": err.Error()}
-		response := helper.APIResponse("Failed to upload campaign image to database", http.StatusBadRequest, "error", data)
+		response := helper.APIResponse("Upload campaign image failed", http.StatusBadRequest, "error", data)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
