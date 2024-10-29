@@ -6,6 +6,7 @@ import (
 	"go_startup_api/campaign"
 	"go_startup_api/handler"
 	"go_startup_api/helper"
+	"go_startup_api/payment"
 	"go_startup_api/transaction"
 	"go_startup_api/user"
 	"log"
@@ -41,7 +42,8 @@ func main() {
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 	campaignService := campaign.NewService(campaignRepository)
-	transactionService := transaction.NewService(transactionRepository, campaignRepository)
+	paymentService := payment.NewService()
+	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
@@ -64,6 +66,7 @@ func main() {
 
 	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransaction)
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransaction)
+	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 	router.Run()
 
 }

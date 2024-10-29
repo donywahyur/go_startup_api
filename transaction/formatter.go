@@ -2,15 +2,15 @@ package transaction
 
 import "time"
 
-type TransactionFormatter struct {
+type CampaignTransactionFormatter struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name"`
 	Amount    int       `json:"amount"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func FormatTransaction(transaction Transaction) TransactionFormatter {
-	formatter := TransactionFormatter{
+func FormatCampaignTransaction(transaction Transaction) CampaignTransactionFormatter {
+	formatter := CampaignTransactionFormatter{
 		ID:        transaction.ID,
 		Name:      transaction.User.Name,
 		Amount:    transaction.Amount,
@@ -20,11 +20,11 @@ func FormatTransaction(transaction Transaction) TransactionFormatter {
 	return formatter
 }
 
-func FormatTransactions(transactions []Transaction) []TransactionFormatter {
-	transactionFormatter := []TransactionFormatter{}
+func FormatCampaignTransactions(transactions []Transaction) []CampaignTransactionFormatter {
+	transactionFormatter := []CampaignTransactionFormatter{}
 
 	for _, transaction := range transactions {
-		formatter := FormatTransaction(transaction)
+		formatter := FormatCampaignTransaction(transaction)
 		transactionFormatter = append(transactionFormatter, formatter)
 	}
 
@@ -70,4 +70,27 @@ func FormatUserTransactions(transactions []Transaction) []UserTransactionFormatt
 	}
 
 	return transactionFormatter
+}
+
+type TransactionFormatter struct {
+	ID         int    `json:"id"`
+	CampaignID int    `json:"campaign_id"`
+	UserID     int    `json:"user_id"`
+	Amount     int    `json:"amount"`
+	Status     string `json:"status"`
+	Code       string `json:"code"`
+	PaymentURL string `json:"payment_url"`
+}
+
+func FormatTransaction(transaction Transaction) TransactionFormatter {
+	formatter := TransactionFormatter{}
+	formatter.ID = transaction.ID
+	formatter.CampaignID = transaction.CampaignID
+	formatter.UserID = transaction.UserID
+	formatter.Amount = transaction.Amount
+	formatter.Status = transaction.Status
+	formatter.Code = transaction.Code
+	formatter.PaymentURL = transaction.PaymentURL
+
+	return formatter
 }
