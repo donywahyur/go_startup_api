@@ -40,10 +40,10 @@ func (s *service) GetPaymentURL(transaction Transaction, user user.User) (string
 		},
 	}
 
-	_, err := snapGateway.GetToken(snapReq)
+	snapToken, err := snapGateway.GetToken(snapReq)
 	if err != nil {
 		return "", err
 	}
 
-	return "payment_url", nil
+	return snapToken.RedirectURL, nil
 }
