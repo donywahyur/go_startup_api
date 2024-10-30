@@ -14,6 +14,7 @@ type Campaign struct {
 	Perks            string    `json:"perks"`
 	GoalAmount       int       `json:"goal_amount"`
 	CurrentAmount    int       `json:"current_amount"`
+	BackerCount      int       `json:"backer_count"`
 	Slug             string    `json:"slug"`
 	CreatedAt        time.Time `json:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at"`
