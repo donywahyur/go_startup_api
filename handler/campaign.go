@@ -152,7 +152,7 @@ func (h *campaignHandler) UploadCampaignImage(c *gin.Context) {
 	userID := currentUser.ID
 
 	timestamp := time.Now().Unix()
-	path := fmt.Sprintf("campaign_images/%d-%s-%s", userID, strconv.FormatInt(timestamp, 10), file.Filename)
+	path := fmt.Sprintf("images/campaign/%d-%s-%s", userID, strconv.FormatInt(timestamp, 10), file.Filename)
 	err = c.SaveUploadedFile(file, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false, "error": err.Error()}
