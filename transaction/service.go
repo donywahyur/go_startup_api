@@ -4,12 +4,14 @@ import (
 	"errors"
 	"go_startup_api/campaign"
 	"go_startup_api/payment"
+	"strconv"
 )
 
 type Service interface {
 	GetTransactionByCampaignID(input GetTransactionCampaignInput) ([]Transaction, error)
 	GetTransactionByUserID(userID int) ([]Transaction, error)
 	CreateTransaction(input CreateTransactionInput) (Transaction, error)
+	ProcessPayment(input TransactionNotificationInput) error
 }
 
 type service struct {
@@ -55,7 +57,6 @@ func (s *service) CreateTransaction(input CreateTransactionInput) (Transaction, 
 	transaction.Amount = input.Amount
 	transaction.Status = "pending"
 	transaction.UserID = input.User.ID
-	transaction.PaymentURL = "waiting"
 
 	newTransaction, err := s.repository.Save(transaction)
 	if err != nil {
@@ -79,4 +80,45 @@ func (s *service) CreateTransaction(input CreateTransactionInput) (Transaction, 
 	}
 
 	return updateTransaction, nil
+}
+
+func (s *service) ProcessPayment(input TransactionNotificationInput) error {
+	transactionID, _ := strconv.Atoi(input.OrderID)
+	transaction, err := s.repository.GetByID(transactionID)
+	if err != nil {
+		return err
+	}
+
+	if transaction.Status != "pending" {
+		return errors.New("transaction is not pending")
+	}
+
+	if (input.PaymentType == "credit_card") && (input.TransactionStatus == "capture") && (input.FraudStatus == "accept") {
+		transaction.Status = "paid"
+	} else if input.TransactionStatus == "settlement" {
+		transaction.Status = "paid"
+	} else if (input.TransactionStatus == "deny") || (input.TransactionStatus == "expire") || (input.TransactionStatus == "cancel") {
+		transaction.Status = "cancelled"
+	}
+
+	updatedTransaction, err := s.repository.Update(transaction)
+	if err != nil {
+		return err
+	}
+
+	if updatedTransaction.Status == "paid" {
+		campaign, err := s.campaignRepository.FindByID(updatedTransaction.CampaignID)
+		if err != nil {
+			return err
+		}
+
+		campaign.CurrentAmount = campaign.CurrentAmount + updatedTransaction.Amount
+		campaign.BackerCount = campaign.BackerCount + 1
+		_, err = s.campaignRepository.Update(campaign)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
