@@ -8,6 +8,7 @@ import (
 type CampaignFormatter struct {
 	ID               int    `json:"id"`
 	Name             string `json:"name"`
+	Description      string `json:"description"`
 	ShortDescription string `json:"short_description"`
 	ImageUrl         string `json:"image_url"`
 	GoalAmount       int    `json:"goal_amount"`
@@ -20,6 +21,7 @@ func FormatCampaign(campaign Campaign) CampaignFormatter {
 	formatter := CampaignFormatter{
 		ID:               campaign.ID,
 		Name:             campaign.Name,
+		Description:      campaign.Description,
 		ShortDescription: campaign.ShortDescription,
 		ImageUrl:         "",
 		GoalAmount:       campaign.GoalAmount,
@@ -49,6 +51,7 @@ func FormatCampaigns(campaigns []Campaign) []CampaignFormatter {
 type CampaignDetailFormatter struct {
 	ID               int                   `json:"id"`
 	Name             string                `json:"name"`
+	Description      string                `json:"description"`
 	ShortDescription string                `json:"short_description"`
 	ImageUrl         string                `json:"image_url"`
 	GoalAmount       int                   `json:"goal_amount"`
@@ -74,6 +77,7 @@ func FormatCampaignDetail(campaign Campaign) CampaignDetailFormatter {
 	formatter := CampaignDetailFormatter{
 		ID:               campaign.ID,
 		Name:             campaign.Name,
+		Description:      campaign.Description,
 		ShortDescription: campaign.ShortDescription,
 		ImageUrl:         "",
 		GoalAmount:       campaign.GoalAmount,
