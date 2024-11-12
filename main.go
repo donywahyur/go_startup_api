@@ -55,7 +55,7 @@ func main() {
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 	transactionHandler := handler.NewTransactionHandler(transactionService)
 
-	userWebHandler := webHandler.NewUserHandler()
+	userWebHandler := webHandler.NewUserHandler(userService)
 
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
@@ -67,7 +67,9 @@ func main() {
 	}))
 
 	router.HTMLRender = loadTemplates("./web/templates")
-	router.Static("/assets", "./web/assets")
+	router.Static("/js", "./web/assets/js")
+	router.Static("/css", "./web/assets/css")
+	router.Static("/webfonts", "./web/assets/webfonts")
 	router.Static("/images", "./images")
 	api := router.Group("/api/v1")
 
