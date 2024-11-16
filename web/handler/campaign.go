@@ -99,3 +99,75 @@ func (h *campaignHandler) Show(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "campaign_show.html", campaignDetail)
 }
+func (h *campaignHandler) Edit(c *gin.Context) {
+	var inputUrl campaign.GetCampaignDetailInput
+
+	err := c.ShouldBindUri(&inputUrl)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	campaignDetail, err := h.campaignService.GetCampaign(inputUrl)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	var input campaign.FormUpdateCampaignInput
+	input.ID = campaignDetail.ID
+	input.Name = campaignDetail.Name
+	input.ShortDescription = campaignDetail.ShortDescription
+	input.Description = campaignDetail.Description
+	input.Perks = campaignDetail.Perks
+	input.GoalAmount = campaignDetail.GoalAmount
+
+	c.HTML(http.StatusOK, "campaign_edit.html", input)
+}
+func (h *campaignHandler) Update(c *gin.Context) {
+	var inputUrl campaign.GetCampaignDetailInput
+
+	err := c.ShouldBindUri(&inputUrl)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	campaignDetail, err := h.campaignService.GetCampaign(inputUrl)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	var inputData campaign.FormUpdateCampaignInput
+	err = c.ShouldBind(&inputData)
+	if err != nil {
+		inputData.Error = err
+		c.HTML(http.StatusInternalServerError, "campaign_edit.html", inputData)
+		return
+	}
+
+	userDetail, err := h.userService.GetUserByID(campaignDetail.UserID)
+	if err != nil {
+		inputData.Error = err
+		c.HTML(http.StatusInternalServerError, "campaign_edit.html", inputData)
+		return
+	}
+
+	var inputCreate campaign.CreateCampaignInput
+	inputCreate.Name = inputData.Name
+	inputCreate.ShortDescription = inputData.ShortDescription
+	inputCreate.Description = inputData.Description
+	inputCreate.Perks = inputData.Perks
+	inputCreate.GoalAmount = inputData.GoalAmount
+	inputCreate.User = userDetail
+
+	_, err = h.campaignService.UpdateCampaign(inputUrl, inputCreate)
+	if err != nil {
+		inputData.Error = err
+		c.HTML(http.StatusInternalServerError, "campaign_edit.html", inputData)
+		return
+	}
+
+	c.Redirect(http.StatusFound, "/campaigns")
+}

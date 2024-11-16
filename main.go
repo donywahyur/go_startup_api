@@ -103,6 +103,8 @@ func main() {
 	router.GET("/campaigns/new", campaignWebHandler.New)
 	router.POST("/campaigns", campaignWebHandler.Create)
 	router.GET("/campaigns/show/:id", campaignWebHandler.Show)
+	router.GET("/campaigns/edit/:id", campaignWebHandler.Edit)
+	router.POST("/campaigns/update/:id", campaignWebHandler.Update)
 	router.Run()
 
 }
