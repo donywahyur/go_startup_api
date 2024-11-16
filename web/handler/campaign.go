@@ -1,9 +1,13 @@
 package handler
 
 import (
+	"fmt"
 	"go_startup_api/campaign"
 	"go_startup_api/user"
 	"net/http"
+	"os"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -166,6 +170,74 @@ func (h *campaignHandler) Update(c *gin.Context) {
 	if err != nil {
 		inputData.Error = err
 		c.HTML(http.StatusInternalServerError, "campaign_edit.html", inputData)
+		return
+	}
+
+	c.Redirect(http.StatusFound, "/campaigns")
+}
+
+func (h *campaignHandler) Image(c *gin.Context) {
+	var input campaign.GetCampaignDetailInput
+
+	err := c.ShouldBindUri(&input)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	campaignDetail, err := h.campaignService.GetCampaign(input)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	c.HTML(http.StatusOK, "campaign_image.html", campaignDetail)
+}
+
+func (h *campaignHandler) UploadImage(c *gin.Context) {
+	var inputUrl campaign.GetCampaignDetailInput
+
+	err := c.ShouldBindUri(&inputUrl)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	campaignDetail, err := h.campaignService.GetCampaign(inputUrl)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	userDetail, err := h.userService.GetUserByID(campaignDetail.UserID)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	var inputImage campaign.CreateCampaignImageInput
+	inputImage.CampaignID = campaignDetail.ID
+	inputImage.IsPrimary = true
+	inputImage.User = userDetail
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	userID := userDetail.ID
+	timestamp := time.Now().Unix()
+	path := fmt.Sprintf("images/campaign/%d-%s-%s", userID, strconv.FormatInt(timestamp, 10), file.Filename)
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		return
+	}
+
+	_, err = h.campaignService.SaveCampaignImage(inputImage, path)
+	if err != nil {
+		_ = os.Remove(path)
+		c.HTML(http.StatusOK, "campaign_image.html", campaignDetail)
 		return
 	}
 
