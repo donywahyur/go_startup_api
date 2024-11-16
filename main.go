@@ -102,6 +102,7 @@ func main() {
 	router.GET("/campaigns", campaignWebHandler.Index)
 	router.GET("/campaigns/new", campaignWebHandler.New)
 	router.POST("/campaigns", campaignWebHandler.Create)
+	router.GET("/campaigns/show/:id", campaignWebHandler.Show)
 	router.Run()
 
 }

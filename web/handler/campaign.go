@@ -81,3 +81,21 @@ func (h *campaignHandler) Create(c *gin.Context) {
 
 	c.Redirect(http.StatusFound, "/campaigns")
 }
+
+func (h *campaignHandler) Show(c *gin.Context) {
+	var input campaign.GetCampaignDetailInput
+
+	err := c.ShouldBindUri(&input)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	campaignDetail, err := h.campaignService.GetCampaign(input)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+
+	c.HTML(http.StatusOK, "campaign_show.html", campaignDetail)
+}

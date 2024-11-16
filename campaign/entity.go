@@ -29,6 +29,11 @@ func (c Campaign) GoalAmountFormatIDR() string {
 	return ac.FormatMoney(c.GoalAmount)
 }
 
+func (c Campaign) CurrentAmountFormatIDR() string {
+	ac := accounting.Accounting{Symbol: "Rp", Precision: 2, Thousand: ".", Decimal: ","}
+	return ac.FormatMoney(c.GoalAmount)
+}
+
 type CampaignImage struct {
 	ID         int       `json:"id"`
 	CampaignID int       `json:"campaign_id"`
