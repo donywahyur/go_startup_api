@@ -4,6 +4,8 @@ import (
 	"go_startup_api/campaign"
 	"go_startup_api/user"
 	"time"
+
+	"github.com/leekchan/accounting"
 )
 
 type Transaction struct {
@@ -18,4 +20,9 @@ type Transaction struct {
 	User       user.User
 	Campaign   campaign.Campaign
 	PaymentURL string
+}
+
+func (t Transaction) AmountFormatIDR() string {
+	ac := accounting.Accounting{Symbol: "Rp", Precision: 2, Thousand: ".", Decimal: ","}
+	return ac.FormatMoney(t.Amount)
 }
