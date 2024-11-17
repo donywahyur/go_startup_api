@@ -34,3 +34,8 @@ type FormUpdateUserInput struct {
 	Email      string `form:"email" binding:"required,email"`
 	Error      error
 }
+
+type FormLoginInput struct {
+	Email    string `form:"email" binding:"required,email"`
+	Password string `form:"password" binding:"required"`
+}
