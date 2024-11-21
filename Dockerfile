@@ -26,4 +26,4 @@ COPY --from=builder /root/gonuxt_startup/go/main .
 EXPOSE 8080
 
 # Start the Go application
-CMD ["./main"]
+CMD ["go", "run", "main.go"]
