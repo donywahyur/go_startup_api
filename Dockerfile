@@ -1,15 +1,13 @@
 # Use the Go 1.23.2 version
-FROM golang:1.23.2-alpine as builder
+FROM golang:1.23.2-alpine AS builder
 
 # Set a flexible working directory
 WORKDIR /app/go-startup
 
-# Copy Go module files and download dependencies
-COPY go.mod go.sum ./
+# Copy Go module files and download dependencies# Copy the entire application
+COPY . .
 RUN go mod tidy
 
-# Copy the entire application
-COPY . .
 
 # Build the Go application
 RUN go build -o main .
@@ -21,9 +19,14 @@ WORKDIR /app/go-startup
 
 # Copy the compiled binary
 COPY --from=builder /app/go-startup/main .
+COPY --from=builder /app/go-startup/.env .
+
+# Copy everything from the web and images directories
+COPY --from=builder /app/go-startup/web/ /app/go-startup/web/
+COPY --from=builder /app/go-startup/images/ /app/go-startup/images/
 
 # Expose the API port
-EXPOSE 8080
+EXPOSE 80
 
 # Start the Go application
 CMD ["./main"]
